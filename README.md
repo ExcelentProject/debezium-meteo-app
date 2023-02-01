@@ -1,68 +1,40 @@
 # debezium-crypto-app Project
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project is created for testing purposes only! Core idea behind the application is to create data source
+that can produce traffic for debezium connector in order to test this connector in long-running environment.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+Application creates Rest request to [coincap api](https://api.coincap.io/v2/assets) in the interval configured
+by property `update.period` and persist acquired data to PostgreSQL database (default database name is `debezium_crypto`).
+Version of the database can be from 11-15 as Debezium support matrix indicates.
 
 ## Running the application in dev mode
 
+Before you can run the actual app you have to deploy the database. There is prepared docker image for you.
+You can run the database as:
+```shell script
+cd database
+docker build -t tealc-postgres:latest .
+docker run --name postgresql -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -p 5432:5432 -v /tmp/postgresql/:/var/lib/postgresql/data -d tealc-postgres:latest
+```
+Keep in mind that your username and password must be the same that you pass to debezium-crypto application.
 You can run your application in dev mode that enables live coding using:
 ```shell script
 ./mvnw compile quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
-
 ## Packaging and running the application
 
-The application can be packaged using:
+This application can be build as native image:
 ```shell script
-./mvnw package
+./mvnw package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
 ```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
+Once native image is build you can build docker image from that as:
 ```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+docker build -f src/main/docker/Dockerfile.native -t quay.io/tealc/debezium-crypto-app .
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: 
+After image is build you can start the container like this:
 ```shell script
-./mvnw package -Pnative
+docker run --name app -p 127.0.0.1:8080:8080 quarkus/debezium-crypto-app ./application "-Dquarkus.http.host=0.0.0.0" "-Dupdate.period=2s" "-Dquarkus.datasource.jdbc.url=jdbc:postgresql://${CONTAINER_IP_OR_HOST}:5432/debezium_crypto"
 ```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/debezium-crypto-app-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Related Guides
-
-- YAML Configuration ([guide](https://quarkus.io/guides/config#yaml)): Use YAML to configure your Quarkus application
-
-## Provided Code
-
-### YAML Config
-
-Configure your application with YAML
-
-[Related guide section...](https://quarkus.io/guides/config-reference#configuration-examples)
-
-The Quarkus application configuration is located in `src/main/resources/application.yml`.
-
-### RESTEasy Reactive
-
-Easily start your Reactive RESTful Web Services
-
 [Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
