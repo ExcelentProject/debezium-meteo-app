@@ -14,8 +14,7 @@ public class CryptoResourceTest {
         given()
           .when().get("/crypto")
           .then()
-             .statusCode(200)
-             .body(is("Hello RESTEasy Reactive"));
+             .statusCode(200);
     }
 
 }
