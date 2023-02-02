@@ -16,7 +16,7 @@ spec:
     database.dbname: debezium_crypto
     topic.prefix: postgres
     slot.name: debezium
-    table.include.list:
+    table.include.list: public.crypto
     plugin.name: pgoutput
     schema.history.internal.kafka.bootstrap.servers: my-cluster-kafka-bootstrap:9092
     schema.history.internal.kafka.topic: schema-changes.inventory
