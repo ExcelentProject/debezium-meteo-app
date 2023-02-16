@@ -1,9 +1,11 @@
 package io.excellent.project.crypto;
 
 import io.excellent.project.coincap.CryptoJsonService;
-import io.quarkus.arc.DefaultBean;
+import io.excellent.project.crypto.data.mysql.MysqlCryptoEntity;
+import io.excellent.project.crypto.data.postgresql.MysqlCryptoService;
+import io.excellent.project.crypto.data.postgresql.PostgresCryptoService;
+import io.excellent.project.crypto.data.postgresql.PostgreslCryptoEntity;
 import io.quarkus.scheduler.Scheduled;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -14,8 +16,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,22 +31,33 @@ public class CryptoResource {
 
 
     @Inject
-    private CryptoService cryptoService;
+    private PostgresCryptoService postgresCryptoService;
+
+    @Inject
+    private MysqlCryptoService mysqlCryptoService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response cryptoList() {
         log.debug("[API] returning crypto json list");
-        return Response.ok(cryptoService.getAll()).build();
+        return Response.ok(postgresCryptoService.getAll()).build();
+    }
+
+    @GET
+    @Path("/mysql")
+    public Response cryptoListMysql() {
+        log.debug("[API] returning crypto json list from mysql");
+        return Response.ok(mysqlCryptoService.getAll()).build();
     }
 
     @Scheduled(every="{update.period}")
-    void updateTable() {
+    void updateAll() {
         log.debug("[UPDATE] updating crypto table as scheduled");
-        List<CryptoEntity> cryptoList = service.getAll().getData()
-                .stream().map(CryptoEntity::new).collect(Collectors.toList());
+        List<PostgreslCryptoEntity> cryptoList = service.getAll().getData()
+                .stream().map(PostgreslCryptoEntity::new).collect(Collectors.toList());
 
-        cryptoService.saveAll(cryptoList);
+        postgresCryptoService.saveAll(cryptoList);
+        mysqlCryptoService.saveAll(cryptoList.stream().map(MysqlCryptoEntity::new).collect(Collectors.toList()));
     }
 
 }
