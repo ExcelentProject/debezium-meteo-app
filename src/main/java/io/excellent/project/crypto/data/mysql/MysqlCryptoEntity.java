@@ -1,6 +1,7 @@
-package io.excellent.project.crypto;
+package io.excellent.project.crypto.data.mysql;
 
 import io.excellent.project.coincap.model.CryptoJson;
+import io.excellent.project.crypto.data.postgresql.PostgreslCryptoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,12 +16,18 @@ import javax.validation.constraints.NotNull;
 @Table(name = "crypto")
 @AllArgsConstructor
 @Data
-public class CryptoEntity {
-    public CryptoEntity(CryptoJson json) {
+public class MysqlCryptoEntity {
+    public MysqlCryptoEntity(CryptoJson json) {
         this(json.getId(), json.getSymbol(), json.getName(), json.getMarketCapUsd(),
                 json.getPriceUsd(), json.getSupply());
     }
+
+    public MysqlCryptoEntity(PostgreslCryptoEntity e) {
+        this(e.getId(), e.getSymbol(), e.getName(), e.getMarketCapUsd(),
+                e.getPriceUsd(), e.getSupply());
+    }
     @Id
+    @NotNull
     private String id;
     @NotEmpty
     private String symbol;
@@ -39,10 +46,10 @@ public class CryptoEntity {
     @NotNull
     private Double supply;
 
-    public CryptoEntity() {
+    public MysqlCryptoEntity() {
     }
 
-    public void updateEntity(CryptoEntity newEntity) {
+    public void updateEntity(MysqlCryptoEntity newEntity) {
         this.marketCapUsd = newEntity.getMarketCapUsd();
         this.priceUsd = newEntity.getPriceUsd();
         this.supply = newEntity.getSupply();
