@@ -21,11 +21,11 @@ jobs:
           java-version: "17"
           distribution: "adopt"
 
-      - name: GraalVM 21.2.0
+      - name: GraalVM 22.3.2
         uses: ayltai/setup-graalvm@v1
         with:
           java-version: 17
-          graalvm-version: 21.2.0
+          graalvm-version: 22.3.2
           native-image: true
 
       # Skipping tests for now, as there are none
