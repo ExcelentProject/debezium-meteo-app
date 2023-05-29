@@ -1,5 +1,6 @@
 package io.excellent.project.dmt;
 
+import io.debezium.performance.dmt.schema.DatabaseEntry;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
@@ -27,5 +28,5 @@ public interface DmtJsonService {
 
     @POST
     @Path("/CreateTableAndUpsert")
-    Uni<Response> createAndUpsert(JsonSchema schema);
+    Uni<Response> createAndUpsert(DatabaseEntry schema);
 }
