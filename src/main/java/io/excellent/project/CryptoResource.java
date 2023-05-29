@@ -1,9 +1,9 @@
 package io.excellent.project;
 
+import io.debezium.performance.dmt.schema.DatabaseEntry;
 import io.excellent.project.coincap.CryptoJsonService;
 import io.excellent.project.coincap.model.CryptoJsonPage;
 import io.excellent.project.dmt.DmtJsonService;
-import io.excellent.project.dmt.JsonSchema;
 import io.excellent.project.dmt.JsonTranslator;
 import io.quarkus.scheduler.Scheduled;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -58,12 +57,11 @@ public class CryptoResource {
     void updateAll() {
         if (state.get()) {
             log.info("[UPDATE] updating crypto table as scheduled");
-            List<String> databases = Arrays.asList("Mysql", "Postgresql", "Mongo");
             CryptoJsonPage page = service.getAll();
             JsonTranslator translator = new JsonTranslator();
-            List<JsonSchema> rows = translator.translate(page, databases);
+            List<DatabaseEntry> rows = translator.translate(page);
 
-            for (JsonSchema jsonSchema : rows) {
+            for (DatabaseEntry jsonSchema : rows) {
                 try (Response response = dmtJsonService.createAndUpsert(jsonSchema)
                         .await().atMost(Duration.ofSeconds(5))) {
                     //log.debug("Request completed successfully with status: " + response.getStatus());

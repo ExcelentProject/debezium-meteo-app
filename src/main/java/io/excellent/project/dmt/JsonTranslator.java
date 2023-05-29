@@ -1,55 +1,55 @@
 package io.excellent.project.dmt;
 
+import io.debezium.performance.dmt.schema.DatabaseColumnEntry;
+import io.debezium.performance.dmt.schema.DatabaseEntry;
 import io.excellent.project.coincap.model.CryptoJson;
 import io.excellent.project.coincap.model.CryptoJsonPage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class JsonTranslator {
 
-    public List<JsonSchema> translate(CryptoJsonPage cryptoJsonPage, List<String> databases) {
-        List<JsonSchema> rows = new ArrayList<>();
+    public List<DatabaseEntry> translate(CryptoJsonPage cryptoJsonPage) {
+        List<DatabaseEntry> rows = new ArrayList<>();
 
         for (CryptoJson cryptoJson: cryptoJsonPage.getData()) {
-            JsonSchema jsonSchema = new JsonSchema();
+            DatabaseEntry jsonSchema = new DatabaseEntry();
 
-            JsonTableAttribute id = new JsonTableAttribute();
+            DatabaseColumnEntry id = new DatabaseColumnEntry();
             id.setDataType("VarChar(255)");
-            id.setName("id");
+            id.setColumnName("id");
             id.setValue(cryptoJson.getId());
 
-            JsonTableAttribute rank = new JsonTableAttribute();
+            DatabaseColumnEntry rank = new DatabaseColumnEntry();
             rank.setDataType("Integer");
-            rank.setName("rankino");
+            rank.setColumnName("rankino");
             rank.setValue(cryptoJson.getRank().toString());
 
-            JsonTableAttribute symbol = new JsonTableAttribute();
+            DatabaseColumnEntry symbol = new DatabaseColumnEntry();
             symbol.setDataType("VarChar(255)");
-            symbol.setName("symbol");
+            symbol.setColumnName("symbol");
             symbol.setValue(cryptoJson.getSymbol());
 
-            JsonTableAttribute name = new JsonTableAttribute();
+            DatabaseColumnEntry name = new DatabaseColumnEntry();
             name.setDataType("VarChar(255)");
-            name.setName("name");
+            name.setColumnName("name");
             name.setValue(cryptoJson.getName());
 
-            JsonTableAttribute supply = new JsonTableAttribute();
+            DatabaseColumnEntry supply = new DatabaseColumnEntry();
             supply.setDataType("Double");
-            supply.setName("supply");
+            supply.setColumnName("supply");
             supply.setValue(cryptoJson.getSupply().toString());
 
-            JsonTableAttribute marketCapUsd = new JsonTableAttribute();
+            DatabaseColumnEntry marketCapUsd = new DatabaseColumnEntry();
             marketCapUsd.setDataType("Double");
-            marketCapUsd.setName("marketCapUsd");
+            marketCapUsd.setColumnName("marketCapUsd");
             marketCapUsd.setValue(cryptoJson.getMarketCapUsd().toString());
 
-            jsonSchema.setDatabases(databases);
-            jsonSchema.setTable("crypto");
+            jsonSchema.setName("crypto");
             jsonSchema.setPrimary("id");
-            jsonSchema.setPayload(Arrays.asList(id, rank, symbol, name, supply, marketCapUsd));
+            jsonSchema.setColumnEntries(Arrays.asList(id, rank, symbol, name, supply, marketCapUsd));
             rows.add(jsonSchema);
         }
 
