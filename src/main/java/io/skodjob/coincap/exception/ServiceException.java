@@ -1,4 +1,4 @@
-package io.excellent.project.exception;
+package io.skodjob.coincap.exception;
 
 public class ServiceException extends RuntimeException {
 

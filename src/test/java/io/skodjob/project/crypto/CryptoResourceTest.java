@@ -1,6 +1,5 @@
-package io.excellent.project.crypto;
+package io.skodjob.project.crypto;
 
-import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
